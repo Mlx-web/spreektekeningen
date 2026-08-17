@@ -223,6 +223,100 @@ button {
   margin-bottom: 2px;
 }
 
+/* ---------- Notitie ("tekst voor thuis") ---------- */
+
+.notitie-blok {
+  margin-top: 14px;
+  padding: 14px 16px;
+  background: var(--kaart);
+  border: 1px solid var(--rand);
+  border-radius: 10px;
+  font-size: 0.95rem;
+}
+
+.notitie-blok[hidden] { display: none; }
+
+.notitie-blok__label {
+  display: block;
+  color: var(--inkt-zacht);
+  font-size: 0.8rem;
+  margin-bottom: 4px;
+}
+
+.notitie-blok p {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+/* ---------- Beheer (Thuisarts-link + notitie bewerken) ---------- */
+
+.beheer {
+  margin-top: 28px;
+  padding-top: 18px;
+  border-top: 1px dashed var(--rand);
+}
+
+.beheer__toggle {
+  background: none;
+  border: none;
+  color: var(--inkt-zacht);
+  font-size: 0.85rem;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 4px 0;
+}
+
+.beheer__toggle:hover { color: var(--accent); }
+
+.beheer__form {
+  margin-top: 12px;
+  padding: 16px;
+  background: var(--kaart);
+  border: 1px solid var(--rand);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.beheer__form[hidden] { display: none; }
+
+.beheer__veld {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.85rem;
+  color: var(--inkt-zacht);
+}
+
+.beheer__veld input,
+.beheer__veld textarea {
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--inkt);
+  padding: 8px 10px;
+  border: 1px solid var(--rand);
+  border-radius: 8px;
+  resize: vertical;
+}
+
+.beheer__knoppen {
+  display: flex;
+  gap: 10px;
+}
+
+.beheer__knoppen .knop {
+  flex: 1 1 auto;
+  padding: 10px 16px;
+  font-size: 0.9rem;
+}
+
+.beheer__status {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--inkt-zacht);
+}
+
 /* ---------- Printgebied ---------- */
 /* Los van het interactieve gebied: print toont altijd de VOLTOOIDE
    tekening, ongeacht bij welke stap de animatie op scherm net stond. */

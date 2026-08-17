@@ -15,12 +15,15 @@ window.THEMAS = window.THEMAS || {};
  *                                     Wordt onderdeel van de link /tekeningen/<slug>.
  * @param {string} thema.titel
  * @param {string} thema.omschrijving  Korte tekst, zichtbaar in het menu.
- * @param {string} thema.thuisartsUrl  Link naar de bijbehorende Thuisarts.nl-pagina.
- *                                     Laat leeg ("") als die nog niet ingevuld is.
  * @param {string} thema.viewBox       SVG viewBox, bv. "0 0 400 400".
  * @param {Array<{label: string, paden: string[]}>} thema.stappen
  *                                     Elke stap is één of meer SVG-pad-
  *                                     "d"-waardes die tegelijk getekend worden.
+ *
+ * De Thuisarts-link en de "tekst voor thuis" horen NIET in dit bestand --
+ * die vul je in via het "Bewerken"-paneel op de tekenpagina zelf (worden
+ * bewaard op de server, zie netlify/functions/thema-info.js), zodat een
+ * patiënt die de QR-code thuis scant hetzelfde te zien krijgt.
  */
 function registreerThema(thema) {
   if (!thema || !thema.slug) {

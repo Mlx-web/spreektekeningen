@@ -7,7 +7,6 @@ registreerThema({
   slug: "hart",
   titel: "Hart",
   omschrijving: "Het lichaam, met het hart als kloppend middelpunt.",
-  thuisartsUrl: "",
   viewBox: "0 0 400 620",
   stappen: [
     {

@@ -8,7 +8,6 @@ registreerThema({
   slug: "hartklep",
   titel: "Hartklep",
   omschrijving: "Het hart, en het klepje dat de doorstroom regelt.",
-  thuisartsUrl: "",
   viewBox: "0 0 400 620",
   stappen: [
     {

@@ -1,5 +1,7 @@
 [build]
   publish = "public"
+  functions = "netlify/functions"
+  command = "npm install"
 
 # Zorgt dat de QR-code/print-link naar de "mooie" URL /tekeningen/<slug>
 # gewoon tekening.html serveert (die leest de slug uit het laatste
@@ -8,4 +10,10 @@
 [[redirects]]
   from = "/tekeningen/*"
   to = "/tekening.html"
+  status = 200
+
+# Beheer-API (ophalen/opslaan van de Thuisarts-link + notitie per thema).
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
   status = 200

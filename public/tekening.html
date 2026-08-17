@@ -40,6 +40,40 @@
         <span class="thuisarts-link__label">Meer lezen op Thuisarts.nl</span>
         <span id="thuisarts-link-tekst"></span>
       </a>
+
+      <div id="notitie-blok" class="notitie-blok" hidden>
+        <span class="notitie-blok__label">Voor thuis</span>
+        <p id="notitie-tekst"></p>
+      </div>
+
+      <!--
+        Bewerken: alleen te gebruiken met het wachtwoord (env var
+        BEHEER_WACHTWOORD op Netlify). Ophalen (GET) is altijd publiek --
+        dat is precies wat de patiënt thuis via de QR-code te zien krijgt.
+        Opslaan (POST) gaat via netlify/functions/thema-info.js.
+      -->
+      <div class="beheer">
+        <button id="beheer-toggle" type="button" class="beheer__toggle">Bewerken</button>
+        <form id="beheer-form" class="beheer__form" hidden>
+          <label class="beheer__veld">
+            Wachtwoord
+            <input type="password" id="beheer-wachtwoord" autocomplete="current-password">
+          </label>
+          <label class="beheer__veld">
+            Thuisarts.nl-link
+            <input type="url" id="beheer-thuisarts" placeholder="https://www.thuisarts.nl/...">
+          </label>
+          <label class="beheer__veld">
+            Tekst voor thuis
+            <textarea id="beheer-notitie" rows="4" placeholder="Wat wil je dat de patiënt thuis nog eens kan teruglezen?"></textarea>
+          </label>
+          <div class="beheer__knoppen">
+            <button type="submit" class="knop knop--primair">Opslaan</button>
+            <button type="button" id="beheer-annuleren" class="knop knop--secundair">Annuleren</button>
+          </div>
+          <p id="beheer-status" class="beheer__status" hidden></p>
+        </form>
+      </div>
     </div>
 
     <!-- Printgebied: onzichtbaar op scherm, toont bij het printen altijd de
@@ -54,6 +88,7 @@
           <p>Scan de QR-code om deze uitleg thuis nog eens te bekijken, of typ:</p>
           <p id="print-url"></p>
           <p id="print-thuisarts"></p>
+          <p id="print-notitie"></p>
         </div>
       </div>
     </div>

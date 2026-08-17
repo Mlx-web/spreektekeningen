@@ -36,6 +36,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     startInteractieveTekening(thema);
     vulPrintgebied(thema);
+    laadThemaInfo(thema);
+    initBeheerPaneel(thema);
   });
 });
 
@@ -133,13 +135,6 @@ function startInteractieveTekening(thema) {
     window.print();
   });
 
-  const thuisartsLink = document.getElementById("thuisarts-link");
-  if (thema.thuisartsUrl) {
-    thuisartsLink.href = thema.thuisartsUrl;
-    document.getElementById("thuisarts-link-tekst").textContent = thema.thuisartsUrl;
-    thuisartsLink.hidden = false;
-  }
-
   bijwerken();
 }
 
@@ -167,8 +162,111 @@ function vulPrintgebied(thema) {
   qr.make();
   document.getElementById("print-qr").innerHTML = qr.createSvgTag({ cellSize: 4, margin: 0 });
 
-  const thuisartsEl = document.getElementById("print-thuisarts");
-  thuisartsEl.textContent = thema.thuisartsUrl
-    ? `Meer lezen: ${thema.thuisartsUrl}`
+  // print-thuisarts en print-notitie worden gevuld door laadThemaInfo()
+  // zodra de beheer-API antwoord heeft gegeven.
+}
+
+/* -------------------------------------------------------------------------
+   Beheer-info (Thuisarts-link + tekst voor thuis)
+   -------------------------------------------------------------------------
+   Deze twee velden staan NIET in het thema-bestand, maar in een klein
+   opslagvakje op de server (netlify/functions/thema-info.js) -- dat is de
+   enige manier waarop "invullen op deze pagina" ook echt zichtbaar wordt
+   voor een patiënt die de QR-code op zijn eigen telefoon scant.
+   GET is altijd publiek (alleen-lezen); opslaan vereist het wachtwoord.
+   ------------------------------------------------------------------------- */
+
+function themaInfoUrl(slug) {
+  return `/api/thema-info?slug=${encodeURIComponent(slug)}`;
+}
+
+function laadThemaInfo(thema) {
+  fetch(themaInfoUrl(thema.slug))
+    .then((res) => (res.ok ? res.json() : { thuisartsUrl: "", notitie: "" }))
+    .catch(() => ({ thuisartsUrl: "", notitie: "" }))
+    .then((info) => toonThemaInfo(info));
+}
+
+function toonThemaInfo(info) {
+  const thuisartsLink = document.getElementById("thuisarts-link");
+  if (info.thuisartsUrl) {
+    thuisartsLink.href = info.thuisartsUrl;
+    document.getElementById("thuisarts-link-tekst").textContent = info.thuisartsUrl;
+    thuisartsLink.hidden = false;
+  } else {
+    thuisartsLink.hidden = true;
+  }
+
+  const notitieBlok = document.getElementById("notitie-blok");
+  if (info.notitie) {
+    document.getElementById("notitie-tekst").textContent = info.notitie;
+    notitieBlok.hidden = false;
+  } else {
+    notitieBlok.hidden = true;
+  }
+
+  document.getElementById("print-thuisarts").textContent = info.thuisartsUrl
+    ? `Meer lezen: ${info.thuisartsUrl}`
     : "";
+  document.getElementById("print-notitie").textContent = info.notitie || "";
+
+  // Bewerk-formulier alvast vullen met de huidige waardes, zodat je bij
+  // het openen ziet wat er nu staat in plaats van lege velden.
+  document.getElementById("beheer-thuisarts").value = info.thuisartsUrl || "";
+  document.getElementById("beheer-notitie").value = info.notitie || "";
+}
+
+function initBeheerPaneel(thema) {
+  const toggle = document.getElementById("beheer-toggle");
+  const form = document.getElementById("beheer-form");
+  const annuleren = document.getElementById("beheer-annuleren");
+  const statusEl = document.getElementById("beheer-status");
+
+  toggle.addEventListener("click", () => {
+    form.hidden = !form.hidden;
+  });
+
+  annuleren.addEventListener("click", () => {
+    form.hidden = true;
+    statusEl.hidden = true;
+  });
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const wachtwoordVeld = document.getElementById("beheer-wachtwoord");
+    const payload = {
+      wachtwoord: wachtwoordVeld.value,
+      thuisartsUrl: document.getElementById("beheer-thuisarts").value,
+      notitie: document.getElementById("beheer-notitie").value
+    };
+
+    statusEl.hidden = false;
+    statusEl.textContent = "Bezig met opslaan...";
+
+    fetch(themaInfoUrl(thema.slug), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    })
+      .then(async (res) => {
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          throw new Error(data.fout || "Opslaan is niet gelukt.");
+        }
+        return data;
+      })
+      .then((info) => {
+        toonThemaInfo(info);
+        statusEl.textContent = "Opgeslagen.";
+        wachtwoordVeld.value = "";
+        setTimeout(() => {
+          form.hidden = true;
+          statusEl.hidden = true;
+        }, 1200);
+      })
+      .catch((err) => {
+        statusEl.textContent = err.message;
+      });
+  });
 }
