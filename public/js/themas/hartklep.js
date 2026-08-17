@@ -8,6 +8,7 @@ registreerThema({
   slug: "hartklep",
   titel: "Hartklep",
   omschrijving: "Het hart, en het klepje dat de doorstroom regelt.",
+  kleur: "#3B6EA5",
   viewBox: "0 0 400 620",
   stappen: [
     {

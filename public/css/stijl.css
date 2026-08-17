@@ -1,7 +1,9 @@
 /* =========================================================================
    Spreektekeningen — basisstijl.
-   Rustig en leesbaar: dit wordt oog-in-oog met patiënten gebruikt, dus
-   geen speelse afleiding, wel grote knoppen (ook fijn op een touchscreen).
+   Het menuscherm mag kleurig en uitnodigend zijn (elke tegel in de eigen
+   themakleur, met de volledige tekening erop). Het tekenscherm zelf blijft
+   rustig en leesbaar -- dat wordt oog-in-oog met patiënten gebruikt, dus
+   daar geen felle vlakken, wel grote knoppen (ook fijn op een touchscreen).
    ========================================================================= */
 
 :root {
@@ -68,44 +70,68 @@ button {
   color: var(--inkt-zacht);
 }
 
-/* ---------- Menuscherm: kaarten-grid ---------- */
+/* ---------- Menuscherm: kleurrijke tegel-grid ---------- */
 
 .thema-grid {
   max-width: 1000px;
   margin: 0 auto;
   padding: 8px 24px 64px;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 22px;
 }
 
-.thema-kaart {
-  display: block;
-  background: var(--kaart);
-  border: 1px solid var(--rand);
-  border-radius: var(--straal);
-  padding: 22px 22px 24px;
+.thema-tegel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  aspect-ratio: 4 / 5;
+  background: var(--kleur, var(--kaart));
+  border-radius: 20px;
+  overflow: hidden;
   text-decoration: none;
+  padding: 14px 10px 46px;
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.12);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+}
+
+.thema-tegel:hover,
+.thema-tegel:focus-visible {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 0 rgba(0, 0, 0, 0.14);
+}
+
+.thema-tegel:active {
+  transform: translateY(0) scale(0.99);
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.12);
+}
+
+.thema-tegel__tekening {
+  width: 100%;
+  height: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* De tekening zelf blijft dezelfde donkere lijnstijl als op de tekenpagina
+   (.tekening-pad in de sectie hieronder) -- alleen de tegel erachter krijgt
+   kleur. Zo blijft er maar één plek (.tekening-pad) die bepaalt hoe een
+   lijn eruitziet. */
+
+.thema-tegel__naam {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%);
+  max-width: 86%;
+  font-weight: 700;
+  font-size: 1.05rem;
+  padding: 6px 18px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
   color: var(--inkt);
-  transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.thema-kaart:hover,
-.thema-kaart:focus-visible {
-  border-color: var(--accent);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(27, 111, 106, 0.12);
-}
-
-.thema-kaart__titel {
-  margin: 0 0 8px;
-  font-size: 1.2rem;
-}
-
-.thema-kaart__omschrijving {
-  margin: 0;
-  color: var(--inkt-zacht);
-  font-size: 0.95rem;
+  white-space: nowrap;
 }
 
 .leeg-bericht {

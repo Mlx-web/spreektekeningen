@@ -15,6 +15,7 @@ window.THEMAS = window.THEMAS || {};
  *                                     Wordt onderdeel van de link /tekeningen/<slug>.
  * @param {string} thema.titel
  * @param {string} thema.omschrijving  Korte tekst, zichtbaar in het menu.
+ * @param {string} thema.kleur         Achtergrondkleur van de tegel in het menu (hex).
  * @param {string} thema.viewBox       SVG viewBox, bv. "0 0 400 400".
  * @param {Array<{label: string, paden: string[]}>} thema.stappen
  *                                     Elke stap is één of meer SVG-pad-

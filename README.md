@@ -80,7 +80,12 @@ QR-code thuis scannen (en op een print die je daarna maakt).
 2. Pas de inhoud aan:
    - `slug` — wordt onderdeel van de link (`/tekeningen/<slug>`). Alleen
      kleine letters, cijfers en streepjes.
-   - `titel`, `omschrijving` — voor in het menu.
+   - `titel`, `omschrijving` — voor in het menu (`omschrijving` staat niet
+     op de tegel zelf, maar bijvoorbeeld handig als `alt`-achtige notitie
+     voor jezelf).
+   - `kleur` — de achtergrondkleur van de tegel in het menu (hex, bv.
+     `"#F0654E"`). De volledig getekende versie van het thema wordt in de
+     gewone donkere lijnstijl bovenop die kleur getoond.
    - `viewBox` — het SVG-canvas, bv. `"0 0 400 400"`.
    - `stappen` — een lijst van stappen. Elke stap heeft een `label` (voor
      jezelf, verschijnt onder de tekening) en `paden`: één of meer

@@ -7,6 +7,7 @@ registreerThema({
   slug: "hart",
   titel: "Hart",
   omschrijving: "Het lichaam, met het hart als kloppend middelpunt.",
+  kleur: "#F0654E",
   viewBox: "0 0 400 620",
   stappen: [
     {
