@@ -7,5 +7,6 @@
      3. Voeg "<jouw-slug>" hieronder toe aan de lijst
    Geen build-stap nodig — gewoon opslaan en herladen. */
 window.THEMA_MANIFEST = [
-  "voorbeeld-hart"
+  "hart",
+  "hartklep"
 ];
