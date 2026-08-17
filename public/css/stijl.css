@@ -1,0 +1,288 @@
+/* =========================================================================
+   Spreektekeningen — basisstijl.
+   Rustig en leesbaar: dit wordt oog-in-oog met patiënten gebruikt, dus
+   geen speelse afleiding, wel grote knoppen (ook fijn op een touchscreen).
+   ========================================================================= */
+
+:root {
+  --accent: #1b6f6a;
+  --accent-donker: #124e4a;
+  --inkt: #1c2422;
+  --inkt-zacht: #52605d;
+  --achtergrond: #faf9f6;
+  --kaart: #ffffff;
+  --rand: #dfe4e2;
+  --straal: 14px;
+
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  background: var(--achtergrond);
+  color: var(--inkt);
+  line-height: 1.5;
+}
+
+a { color: inherit; }
+
+button {
+  font-family: inherit;
+}
+
+/* ---------- Koptekst (beide schermen) ---------- */
+
+.koptekst {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 32px 24px 8px;
+}
+
+.koptekst h1 {
+  font-size: 1.7rem;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.koptekst__terug {
+  font-size: 0.95rem;
+  color: var(--inkt-zacht);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.koptekst__terug:hover { color: var(--accent); }
+
+.subtitel {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 24px 24px;
+  color: var(--inkt-zacht);
+}
+
+/* ---------- Menuscherm: kaarten-grid ---------- */
+
+.thema-grid {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 8px 24px 64px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 18px;
+}
+
+.thema-kaart {
+  display: block;
+  background: var(--kaart);
+  border: 1px solid var(--rand);
+  border-radius: var(--straal);
+  padding: 22px 22px 24px;
+  text-decoration: none;
+  color: var(--inkt);
+  transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.thema-kaart:hover,
+.thema-kaart:focus-visible {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(27, 111, 106, 0.12);
+}
+
+.thema-kaart__titel {
+  margin: 0 0 8px;
+  font-size: 1.2rem;
+}
+
+.thema-kaart__omschrijving {
+  margin: 0;
+  color: var(--inkt-zacht);
+  font-size: 0.95rem;
+}
+
+.leeg-bericht {
+  color: var(--inkt-zacht);
+}
+
+/* ---------- Animatiescherm ---------- */
+
+.tekening-omgeving {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 24px 48px;
+}
+
+.tekening-kader {
+  background: var(--kaart);
+  border: 1px solid var(--rand);
+  border-radius: var(--straal);
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tekening-kader svg {
+  width: 100%;
+  height: auto;
+  max-height: 60vh;
+}
+
+/* De getekende lijnen: stroke-dasharray/-dashoffset wordt per pad in JS
+   gezet (dat vereist de werkelijke padlengte, dus dat kan niet in CSS). */
+.tekening-pad {
+  fill: none;
+  stroke: var(--inkt);
+  stroke-width: 4.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke-dashoffset 0.9s ease;
+}
+
+.tekening-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 14px 2px 0;
+  color: var(--inkt-zacht);
+  font-size: 0.9rem;
+}
+
+.tekening-knoppen {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+
+.knop {
+  flex: 1 1 auto;
+  min-width: 140px;
+  padding: 16px 20px;
+  border-radius: 999px;
+  border: none;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.knop:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.knop--primair {
+  background: var(--accent);
+  color: #fff;
+}
+.knop--primair:hover:not(:disabled) { background: var(--accent-donker); }
+
+.knop--secundair {
+  background: transparent;
+  color: var(--inkt);
+  border: 1.5px solid var(--rand);
+}
+.knop--secundair:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+
+.tekening-extra {
+  margin-top: 12px;
+}
+
+.tekening-extra .knop {
+  width: 100%;
+}
+
+.thuisarts-link {
+  display: block;
+  margin-top: 20px;
+  padding: 14px 16px;
+  background: var(--kaart);
+  border: 1px solid var(--rand);
+  border-radius: 10px;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.thuisarts-link:hover { border-color: var(--accent); }
+
+.thuisarts-link[hidden] { display: none; }
+
+.thuisarts-link__label {
+  display: block;
+  color: var(--inkt-zacht);
+  font-size: 0.8rem;
+  margin-bottom: 2px;
+}
+
+/* ---------- Printgebied ---------- */
+/* Los van het interactieve gebied: print toont altijd de VOLTOOIDE
+   tekening, ongeacht bij welke stap de animatie op scherm net stond. */
+
+.printgebied {
+  display: none;
+}
+
+@media print {
+  body * { visibility: hidden; }
+
+  .printgebied,
+  .printgebied * {
+    visibility: visible;
+  }
+
+  .printgebied {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 24px;
+  }
+
+  .printgebied__titel {
+    font-size: 1.4rem;
+    margin: 0 0 16px;
+  }
+
+  .printgebied__tekening {
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto 24px;
+    display: block;
+  }
+
+  .printgebied__tekening .tekening-pad {
+    transition: none;
+    stroke-dashoffset: 0 !important;
+  }
+
+  .printgebied__onderkant {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  .printgebied__qr {
+    width: 110px;
+    height: 110px;
+    flex: none;
+  }
+
+  .printgebied__links {
+    font-size: 0.85rem;
+    color: #333;
+  }
+
+  .printgebied__links p { margin: 0 0 6px; }
+}

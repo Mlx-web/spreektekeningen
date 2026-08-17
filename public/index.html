@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spreektekeningen</title>
+  <link rel="stylesheet" href="css/stijl.css">
+</head>
+<body>
+
+  <header class="koptekst">
+    <h1>Spreektekeningen</h1>
+  </header>
+  <p class="subtitel">Kies een tekening om te starten.</p>
+
+  <!--
+    Het overzicht hieronder wordt automatisch gevuld op basis van
+    js/themas/manifest.js + de bijbehorende thema-bestanden.
+    Nieuw thema toevoegen? Zie de uitleg in js/themas/manifest.js —
+    hier hoeft niets aangepast te worden.
+  -->
+  <main id="thema-grid" class="thema-grid" aria-label="Beschikbare tekeningen"></main>
+
+  <script src="js/registry.js"></script>
+  <script src="js/themas/manifest.js"></script>
+  <script src="js/menu.js"></script>
+</body>
+</html>

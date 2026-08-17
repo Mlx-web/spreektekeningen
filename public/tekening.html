@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spreektekeningen</title>
+  <link rel="stylesheet" href="css/stijl.css">
+</head>
+<body>
+
+  <header class="koptekst">
+    <h1 id="thema-titel">Tekening</h1>
+    <a class="koptekst__terug" href="index.html">← Overzicht</a>
+  </header>
+
+  <main class="tekening-omgeving">
+
+    <!-- Interactief gebied: dit is wat er op scherm staat tijdens het consult. -->
+    <div id="interactief-gebied">
+      <div class="tekening-kader">
+        <!-- De paden worden hier door tekening.js ingevoegd (viewBox uit het thema). -->
+        <svg id="tekening-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
+
+      <div class="tekening-info">
+        <span id="stap-label">—</span>
+        <span id="stap-teller"></span>
+      </div>
+
+      <div class="tekening-knoppen">
+        <button id="knop-reset" type="button" class="knop knop--secundair">Opnieuw</button>
+        <button id="knop-volgende" type="button" class="knop knop--primair">Volgende stap</button>
+      </div>
+
+      <div class="tekening-extra">
+        <button id="knop-print" type="button" class="knop knop--secundair">Print deze tekening</button>
+      </div>
+
+      <a id="thuisarts-link" class="thuisarts-link" href="#" target="_blank" rel="noopener" hidden>
+        <span class="thuisarts-link__label">Meer lezen op Thuisarts.nl</span>
+        <span id="thuisarts-link-tekst"></span>
+      </a>
+    </div>
+
+    <!-- Printgebied: onzichtbaar op scherm, toont bij het printen altijd de
+         VOLTOOIDE tekening + QR-code, los van de huidige stap op scherm.
+         Wordt gevuld door tekening.js zodra het thema geladen is. -->
+    <div id="printgebied" class="printgebied">
+      <h1 id="print-titel" class="printgebied__titel"></h1>
+      <svg id="print-svg" class="printgebied__tekening" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div class="printgebied__onderkant">
+        <div id="print-qr" class="printgebied__qr"></div>
+        <div class="printgebied__links">
+          <p>Scan de QR-code om deze uitleg thuis nog eens te bekijken, of typ:</p>
+          <p id="print-url"></p>
+          <p id="print-thuisarts"></p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="js/vendor/qrcode.js"></script>
+  <script src="js/registry.js"></script>
+  <script src="js/themas/manifest.js"></script>
+  <script src="js/tekening.js"></script>
+</body>
+</html>

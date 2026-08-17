@@ -1,0 +1,11 @@
+[build]
+  publish = "public"
+
+# Zorgt dat de QR-code/print-link naar de "mooie" URL /tekeningen/<slug>
+# gewoon tekening.html serveert (die leest de slug uit het laatste
+# pad-onderdeel). status = 200 = rewrite, dus de URL in de adresbalk
+# blijft /tekeningen/<slug> staan.
+[[redirects]]
+  from = "/tekeningen/*"
+  to = "/tekening.html"
+  status = 200
