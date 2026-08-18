@@ -271,6 +271,31 @@ function toonThemaInfo(info) {
     : "";
   document.getElementById("print-notitie").textContent = info.notitie || "";
 
+  // Tweede QR-code op de print, alleen voor als er een Thuisarts-link is:
+  // handig voor een patiënt die een PAPIEREN print meekrijgt (kan niet
+  // zinvol een link aanklikken op papier, dus daar juist wel een QR-code).
+  const printThuisartsQrItem = document.getElementById("print-thuisarts-qr-item");
+  if (info.thuisartsUrl) {
+    document.getElementById("print-qr-thuisarts").innerHTML = maakQrSvg(info.thuisartsUrl, 4);
+    printThuisartsQrItem.hidden = false;
+  } else {
+    printThuisartsQrItem.hidden = true;
+  }
+
+  // Klikbare link op het scherm, alleen voor als er een Thuisarts-link is:
+  // handig voor een patiënt die de tekening al op zijn EIGEN scherm bekijkt
+  // (bv. na het scannen van de QR-code hierboven) -- daar is een QR-code
+  // niet zinvol te scannen, een link wel.
+  const zijpaneelThuisartsBlok = document.getElementById("zijpaneel-thuisarts-blok");
+  if (info.thuisartsUrl) {
+    const link = document.getElementById("zijpaneel-thuisarts-link");
+    link.href = info.thuisartsUrl;
+    link.textContent = info.thuisartsUrl;
+    zijpaneelThuisartsBlok.hidden = false;
+  } else {
+    zijpaneelThuisartsBlok.hidden = true;
+  }
+
   // Velden in het zijpaneel vullen met de huidige waardes, zodat je bij
   // het openen ziet wat er nu staat in plaats van lege velden.
   document.getElementById("beheer-thuisarts").value = info.thuisartsUrl || "";

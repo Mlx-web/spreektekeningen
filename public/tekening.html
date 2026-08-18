@@ -52,6 +52,15 @@
           <p class="zijpaneel__qr-tekst">Deze QR-code kan de patiënt scannen om de tekening thuis nog eens te bekijken.</p>
         </div>
 
+        <!-- Alleen zichtbaar als er een Thuisarts-link is ingevuld. Dit is
+             een klikbare link (geen QR-code): wie hier al op scherm kijkt
+             -- bv. omdat de bovenstaande QR-code net gescand is -- kan een
+             QR-code op datzelfde scherm niet zinvol scannen. -->
+        <div id="zijpaneel-thuisarts-blok" class="zijpaneel__qr-blok" hidden>
+          <p class="zijpaneel__qr-tekst">Meer lezen op Thuisarts.nl:</p>
+          <a id="zijpaneel-thuisarts-link" class="zijpaneel__thuisarts-link" href="#" target="_blank" rel="noopener"></a>
+        </div>
+
         <form id="beheer-form" class="beheer__form">
           <label class="beheer__veld">
             Thuisarts.nl-link
@@ -81,7 +90,20 @@
       <h1 id="print-titel" class="printgebied__titel"></h1>
       <svg id="print-svg" class="printgebied__tekening" xmlns="http://www.w3.org/2000/svg"></svg>
       <div class="printgebied__onderkant">
-        <div id="print-qr" class="printgebied__qr"></div>
+        <div class="printgebied__qr-groep">
+          <div class="printgebied__qr-item">
+            <div id="print-qr" class="printgebied__qr"></div>
+            <p class="printgebied__qr-caption">Bekijk thuis</p>
+          </div>
+          <!-- Alleen zichtbaar als er een Thuisarts-link is ingevuld: een
+               tweede QR-code speciaal voor de Thuisarts.nl-pagina, zodat
+               de patiënt die vanaf papier (niet vanaf scherm) start ook
+               daar direct naartoe kan scannen. -->
+          <div id="print-thuisarts-qr-item" class="printgebied__qr-item" hidden>
+            <div id="print-qr-thuisarts" class="printgebied__qr"></div>
+            <p class="printgebied__qr-caption">Thuisarts.nl</p>
+          </div>
+        </div>
         <div class="printgebied__links">
           <p>Scan de QR-code om deze uitleg thuis nog eens te bekijken, of typ:</p>
           <p id="print-url"></p>

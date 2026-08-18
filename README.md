@@ -97,6 +97,16 @@ Na het invullen van het wachtwoord en op "Opslaan" klikken, is de wijziging
 meteen zichtbaar — zowel op je eigen scherm als voor patiënten die de
 QR-code thuis scannen (en op een print die je daarna maakt).
 
+Zodra er een Thuisarts.nl-link is ingevuld, verschijnt die op twee manieren,
+afhankelijk van hoe de patiënt de tekening te zien krijgt:
+- **Op een print** — een tweede QR-code (naast de bestaande QR-code om de
+  tekening thuis te herbekijken), speciaal voor de Thuisarts.nl-pagina. Op
+  papier is een link niet aan te klikken, dus daar is een QR-code handiger.
+- **Op het scherm** — een klikbare link in het zijpaneel (geen extra
+  QR-code). Wie de tekening al op zijn eigen scherm bekijkt — bijvoorbeeld
+  na het scannen van de eerste QR-code — kan een QR-code op datzelfde
+  scherm toch niet zinvol scannen; een link werkt daar wél meteen.
+
 ## Een nieuwe categorie toevoegen (lichaamsdeel/orgaan)
 
 1. Kopieer `public/js/categorieen/hart.js` naar
@@ -196,12 +206,14 @@ dat alles even lang duurt ongeacht hoe lang de lijn is. Dat staat bovenin
 
 Het printgebied is een aparte, verborgen kopie van de tekening die **altijd
 volledig getekend** is (geen dasharray-gedoe nodig) plus een QR-code naar
-`<jouw-domein>/tekeningen/<slug>`, en (zodra ingevuld) de Thuisarts.nl-link
-en de tekst voor thuis als leesbare tekst. Die kopie staat los van de
-interactieve tekening op het scherm, dus printen halverwege een uitleg
-toont altijd het complete plaatje — niet de stap waar je net was. Dezelfde
-QR-code staat ook al in het zijpaneel op het
-scherm zelf, niet alleen op de print.
+`<jouw-domein>/tekeningen/<slug>`, en (zodra ingevuld) een tweede QR-code
+naar de Thuisarts.nl-link en de tekst voor thuis als leesbare tekst. Die
+kopie staat los van de interactieve tekening op het scherm, dus printen
+halverwege een uitleg toont altijd het complete plaatje — niet de stap
+waar je net was. De eerste QR-code (terugkijken) staat ook al in het
+zijpaneel op het scherm zelf, niet alleen op de print; de Thuisarts-QR
+wordt op het scherm juist vervangen door een klikbare link (zie
+"Beheren" hierboven voor waarom).
 
 ## Nog niet gebouwd, wel alvast in de opzet meegenomen
 

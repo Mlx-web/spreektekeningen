@@ -329,6 +329,18 @@ button {
   color: var(--inkt-zacht);
 }
 
+.zijpaneel__thuisarts-link {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.9rem;
+  color: var(--accent);
+  word-break: break-word;
+}
+
+.zijpaneel__thuisarts-link:hover {
+  color: var(--accent-donker);
+}
+
 .beheer__form {
   padding: 16px;
   background: var(--kaart);
@@ -432,10 +444,27 @@ button {
     margin: 0 auto;
   }
 
+  .printgebied__qr-groep {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    flex: none;
+  }
+
+  .printgebied__qr-item {
+    text-align: center;
+  }
+
   .printgebied__qr {
     width: 110px;
     height: 110px;
     flex: none;
+  }
+
+  .printgebied__qr-caption {
+    margin: 4px 0 0;
+    font-size: 0.7rem;
+    color: #333;
   }
 
   .printgebied__links {
