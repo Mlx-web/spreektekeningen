@@ -193,9 +193,23 @@ button {
 /* ---------- Animatiescherm ---------- */
 
 .tekening-omgeving {
-  max-width: 720px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 0 24px 48px;
+}
+
+#interactief-gebied {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 32px;
+  align-items: start;
+}
+
+/* Op brede schermen: tekening links, zijpaneel rechts (vaste breedte). */
+@media (min-width: 860px) {
+  #interactief-gebied {
+    grid-template-columns: minmax(0, 1fr) 320px;
+  }
 }
 
 .tekening-kader {
@@ -214,15 +228,15 @@ button {
   max-height: 60vh;
 }
 
-/* De getekende lijnen: stroke-dasharray/-dashoffset wordt per pad in JS
-   gezet (dat vereist de werkelijke padlengte, dus dat kan niet in CSS). */
+/* De getekende lijnen: stroke-dasharray/-dashoffset én de transitieduur
+   (TEKEN_DUUR_MS) worden per pad in tekening.js gezet -- dat vereist de
+   werkelijke padlengte, dus dat kan niet in CSS. */
 .tekening-pad {
   fill: none;
   stroke: var(--inkt);
   stroke-width: 4.5;
   stroke-linecap: round;
   stroke-linejoin: round;
-  transition: stroke-dashoffset 0.9s ease;
 }
 
 .tekening-info {
@@ -279,75 +293,43 @@ button {
   width: 100%;
 }
 
-.thuisarts-link {
-  display: block;
-  margin-top: 20px;
-  padding: 14px 16px;
+/* ---------- Zijpaneel (QR + aantekeningen + Thuisarts-link + notitie) ---------- */
+/* Altijd zichtbaar naast de tekening -- zie de toelichting in tekening.html
+   over wie dit allemaal te zien krijgt (geen apart inlog-/rolonderscheid). */
+
+.zijpaneel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.zijpaneel__qr-blok {
   background: var(--kaart);
   border: 1px solid var(--rand);
-  border-radius: 10px;
-  text-decoration: none;
-  font-size: 0.95rem;
+  border-radius: var(--straal);
+  padding: 18px;
+  text-align: center;
 }
 
-.thuisarts-link:hover { border-color: var(--accent); }
+.zijpaneel__qr {
+  width: 100%;
+  max-width: 180px;
+  margin: 0 auto 12px;
+}
 
-.thuisarts-link[hidden] { display: none; }
-
-.thuisarts-link__label {
+.zijpaneel__qr svg {
+  width: 100%;
+  height: auto;
   display: block;
-  color: var(--inkt-zacht);
-  font-size: 0.8rem;
-  margin-bottom: 2px;
 }
 
-/* ---------- Notitie ("tekst voor thuis") ---------- */
-
-.notitie-blok {
-  margin-top: 14px;
-  padding: 14px 16px;
-  background: var(--kaart);
-  border: 1px solid var(--rand);
-  border-radius: 10px;
-  font-size: 0.95rem;
-}
-
-.notitie-blok[hidden] { display: none; }
-
-.notitie-blok__label {
-  display: block;
-  color: var(--inkt-zacht);
-  font-size: 0.8rem;
-  margin-bottom: 4px;
-}
-
-.notitie-blok p {
+.zijpaneel__qr-tekst {
   margin: 0;
-  white-space: pre-wrap;
-}
-
-/* ---------- Beheer (Thuisarts-link + notitie bewerken) ---------- */
-
-.beheer {
-  margin-top: 28px;
-  padding-top: 18px;
-  border-top: 1px dashed var(--rand);
-}
-
-.beheer__toggle {
-  background: none;
-  border: none;
-  color: var(--inkt-zacht);
   font-size: 0.85rem;
-  text-decoration: underline;
-  cursor: pointer;
-  padding: 4px 0;
+  color: var(--inkt-zacht);
 }
-
-.beheer__toggle:hover { color: var(--accent); }
 
 .beheer__form {
-  margin-top: 12px;
   padding: 16px;
   background: var(--kaart);
   border: 1px solid var(--rand);
@@ -356,8 +338,6 @@ button {
   flex-direction: column;
   gap: 12px;
 }
-
-.beheer__form[hidden] { display: none; }
 
 .beheer__veld {
   display: flex;

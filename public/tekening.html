@@ -17,47 +17,45 @@
 
     <!-- Interactief gebied: dit is wat er op scherm staat tijdens het consult. -->
     <div id="interactief-gebied">
-      <div class="tekening-kader">
-        <!-- De paden worden hier door tekening.js ingevoegd (viewBox uit het thema). -->
-        <svg id="tekening-svg" xmlns="http://www.w3.org/2000/svg"></svg>
-      </div>
 
-      <div class="tekening-info">
-        <span id="stap-label">—</span>
-        <span id="stap-teller"></span>
-      </div>
+      <div class="tekening-kolom">
+        <div class="tekening-kader">
+          <!-- De paden worden hier door tekening.js ingevoegd (viewBox uit het thema). -->
+          <svg id="tekening-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+        </div>
 
-      <div class="tekening-knoppen">
-        <button id="knop-reset" type="button" class="knop knop--secundair">Opnieuw</button>
-        <button id="knop-volgende" type="button" class="knop knop--primair">Volgende stap</button>
-      </div>
+        <div class="tekening-info">
+          <span id="stap-label">—</span>
+        </div>
 
-      <div class="tekening-extra">
-        <button id="knop-print" type="button" class="knop knop--secundair">Print deze tekening</button>
-      </div>
+        <div class="tekening-knoppen">
+          <button id="knop-reset" type="button" class="knop knop--secundair">Opnieuw</button>
+          <button id="knop-volgende" type="button" class="knop knop--primair">Maak tekening</button>
+        </div>
 
-      <a id="thuisarts-link" class="thuisarts-link" href="#" target="_blank" rel="noopener" hidden>
-        <span class="thuisarts-link__label">Meer lezen op Thuisarts.nl</span>
-        <span id="thuisarts-link-tekst"></span>
-      </a>
-
-      <div id="notitie-blok" class="notitie-blok" hidden>
-        <span class="notitie-blok__label">Voor thuis</span>
-        <p id="notitie-tekst"></p>
+        <div class="tekening-extra">
+          <button id="knop-print" type="button" class="knop knop--secundair">Print deze tekening</button>
+        </div>
       </div>
 
       <!--
-        Bewerken: alleen te gebruiken met het wachtwoord (env var
-        BEHEER_WACHTWOORD op Netlify). Ophalen (GET) is altijd publiek --
-        dat is precies wat de patiënt thuis via de QR-code te zien krijgt.
-        Opslaan (POST) gaat via netlify/functions/thema-info.js.
+        Zijpaneel: altijd zichtbaar naast de tekening (geen "Bewerken"-klik
+        meer nodig). Let op: dit staat op dezelfde pagina die een patiënt
+        via de QR-code thuis opent -- er is geen inlog/rol-onderscheid (net
+        als in de rest van de app), dus net als bij de Thuisarts-link geldt
+        hier: geen patiëntgegevens invullen. Opslaan (POST) vereist het
+        wachtwoord (env var BEHEER_WACHTWOORD); ophalen (GET) is publiek.
       -->
-      <div class="beheer">
-        <button id="beheer-toggle" type="button" class="beheer__toggle">Bewerken</button>
-        <form id="beheer-form" class="beheer__form" hidden>
+      <aside class="zijpaneel">
+        <div class="zijpaneel__qr-blok">
+          <div id="zijpaneel-qr" class="zijpaneel__qr"></div>
+          <p class="zijpaneel__qr-tekst">Deze QR-code kan de patiënt scannen om de tekening thuis nog eens te bekijken.</p>
+        </div>
+
+        <form id="beheer-form" class="beheer__form">
           <label class="beheer__veld">
-            Wachtwoord
-            <input type="password" id="beheer-wachtwoord" autocomplete="current-password">
+            Aantekeningen (voor jezelf)
+            <textarea id="beheer-aantekeningen" rows="4" placeholder="Eigen aantekeningen bij dit onderwerp..."></textarea>
           </label>
           <label class="beheer__veld">
             Thuisarts.nl-link
@@ -65,15 +63,18 @@
           </label>
           <label class="beheer__veld">
             Tekst voor thuis
-            <textarea id="beheer-notitie" rows="4" placeholder="Wat wil je dat de patiënt thuis nog eens kan teruglezen?"></textarea>
+            <textarea id="beheer-notitie" rows="3" placeholder="Wat wil je dat de patiënt thuis nog eens kan teruglezen?"></textarea>
+          </label>
+          <label class="beheer__veld">
+            Wachtwoord om op te slaan
+            <input type="password" id="beheer-wachtwoord" autocomplete="current-password">
           </label>
           <div class="beheer__knoppen">
             <button type="submit" class="knop knop--primair">Opslaan</button>
-            <button type="button" id="beheer-annuleren" class="knop knop--secundair">Annuleren</button>
           </div>
           <p id="beheer-status" class="beheer__status" hidden></p>
         </form>
-      </div>
+      </aside>
     </div>
 
     <!-- Printgebied: onzichtbaar op scherm, toont bij het printen altijd de

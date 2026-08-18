@@ -1,10 +1,17 @@
 /* =========================================================================
    Animatiescherm (tekening.html): bouwt de SVG op uit het thema, tekent
-   stap voor stap (stroke-dasharray/-dashoffset), en vult het printgebied
-   (altijd de VOLTOOIDE tekening + QR-code, ongeacht de huidige stap).
+   bij één klik alle stappen automatisch na elkaar (stroke-dasharray/
+   -dashoffset), en vult het printgebied (altijd de VOLTOOIDE tekening +
+   QR-code, ongeacht waar de animatie op scherm is).
    ========================================================================= */
 
 const SVG_NS = "http://www.w3.org/2000/svg";
+
+// Hoe lang één stap over tekenen doet, en de korte pauze daarna voordat de
+// volgende stap begint. Hier aanpassen om trager/sneller te laten tekenen
+// (de CSS-transitieduur wordt hieruit gezet, niet los in stijl.css).
+const TEKEN_DUUR_MS = 2200;
+const PAUZE_TUSSEN_STAPPEN_MS = 500;
 
 function haalSlugOp() {
   const params = new URLSearchParams(location.search);
@@ -37,6 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       startInteractieveTekening(thema);
       vulPrintgebied(thema);
+      toonInteractieveQr(thema);
       laadThemaInfo(thema);
       initBeheerPaneel(thema);
       zetTerugLink(thema);
@@ -60,15 +68,15 @@ function startInteractieveTekening(thema) {
   const svg = document.getElementById("tekening-svg");
   svg.setAttribute("viewBox", thema.viewBox);
 
-  // Eén <path>-element per pad, gegroepeerd per stap (data-stap-index).
+  // Eén <path>-element per pad, gegroepeerd per stap.
   const padenPerStap = [];
-  thema.stappen.forEach((stap, stapIndex) => {
+  thema.stappen.forEach((stap) => {
     const padenVanDezeStap = [];
     stap.paden.forEach((d) => {
       const pad = document.createElementNS(SVG_NS, "path");
       pad.setAttribute("d", d);
       pad.setAttribute("class", "tekening-pad");
-      pad.dataset.stapIndex = String(stapIndex);
+      pad.style.transitionDuration = `${TEKEN_DUUR_MS}ms`;
       svg.appendChild(pad);
       padenVanDezeStap.push(pad);
     });
@@ -93,42 +101,67 @@ function startInteractieveTekening(thema) {
     pad.style.strokeDashoffset = String(lengte);
     pad.style.opacity = "0";
     pad.getBoundingClientRect(); // forceert een reflow vóór we de transition terugzetten
-    pad.style.transition = "";
+    pad.style.transition = `stroke-dashoffset ${TEKEN_DUUR_MS}ms ease`;
   });
 
   const totaalStappen = thema.stappen.length;
   let huidigeStap = 0; // aantal reeds getekende stappen
+  let bezig = false;
+  let timers = [];
 
   const stapLabelEl = document.getElementById("stap-label");
-  const stapTellerEl = document.getElementById("stap-teller");
   const knopVolgende = document.getElementById("knop-volgende");
   const knopReset = document.getElementById("knop-reset");
   const knopPrint = document.getElementById("knop-print");
 
   function bijwerken() {
-    stapTellerEl.textContent = `Stap ${huidigeStap} van ${totaalStappen}`;
-    if (huidigeStap === 0) {
+    if (bezig) {
+      stapLabelEl.textContent = thema.stappen[huidigeStap]
+        ? `Aan het tekenen: ${thema.stappen[huidigeStap].label}...`
+        : "Aan het tekenen...";
+    } else if (huidigeStap === 0) {
       stapLabelEl.textContent = "Klaar om te beginnen";
     } else {
-      stapLabelEl.textContent = thema.stappen[huidigeStap - 1].label;
+      stapLabelEl.textContent = "Voltooid";
     }
 
-    knopVolgende.disabled = huidigeStap >= totaalStappen;
-    knopVolgende.textContent = huidigeStap >= totaalStappen ? "Voltooid" : "Volgende stap";
-    knopReset.disabled = huidigeStap === 0;
+    knopVolgende.disabled = bezig || huidigeStap >= totaalStappen;
+    knopReset.disabled = bezig || huidigeStap === 0;
   }
 
-  knopVolgende.addEventListener("click", () => {
-    if (huidigeStap >= totaalStappen) return;
+  function tekenVolgendeStap() {
+    if (huidigeStap >= totaalStappen) {
+      bezig = false;
+      bijwerken();
+      return;
+    }
+    bijwerken(); // toont "Aan het tekenen: <label>" voor de stap die nu start
     padenPerStap[huidigeStap].forEach((pad) => {
       pad.style.opacity = "1";
       pad.style.strokeDashoffset = "0";
     });
     huidigeStap++;
-    bijwerken();
+
+    if (huidigeStap >= totaalStappen) {
+      timers.push(setTimeout(() => {
+        bezig = false;
+        bijwerken();
+      }, TEKEN_DUUR_MS));
+    } else {
+      timers.push(setTimeout(tekenVolgendeStap, TEKEN_DUUR_MS + PAUZE_TUSSEN_STAPPEN_MS));
+    }
+  }
+
+  knopVolgende.addEventListener("click", () => {
+    if (bezig || huidigeStap >= totaalStappen) return;
+    bezig = true;
+    tekenVolgendeStap();
   });
 
   knopReset.addEventListener("click", () => {
+    timers.forEach(clearTimeout);
+    timers = [];
+    bezig = false;
     // Instant verbergen (geen geanimeerde "terugloop"): logischer voor
     // een reset-knop, en voorkomt dat de teken-transition zichtbaar
     // "terugspoelt".
@@ -137,7 +170,7 @@ function startInteractieveTekening(thema) {
       pad.style.strokeDashoffset = pad.style.strokeDasharray;
       pad.style.opacity = "0";
       pad.getBoundingClientRect();
-      pad.style.transition = "";
+      pad.style.transition = `stroke-dashoffset ${TEKEN_DUUR_MS}ms ease`;
     });
     huidigeStap = 0;
     bijwerken();
@@ -166,27 +199,43 @@ function vulPrintgebied(thema) {
     });
   });
 
-  const herbekijkUrl = `${location.origin}/tekeningen/${encodeURIComponent(thema.slug)}`;
-  document.getElementById("print-url").textContent = herbekijkUrl;
-
-  const qr = qrcode(0, "M");
-  qr.addData(herbekijkUrl);
-  qr.make();
-  document.getElementById("print-qr").innerHTML = qr.createSvgTag({ cellSize: 4, margin: 0 });
+  document.getElementById("print-url").textContent = herbekijkUrl(thema);
+  document.getElementById("print-qr").innerHTML = maakQrSvg(herbekijkUrl(thema), 4);
 
   // print-thuisarts en print-notitie worden gevuld door laadThemaInfo()
   // zodra de beheer-API antwoord heeft gegeven.
 }
 
+function herbekijkUrl(thema) {
+  return `${location.origin}/tekeningen/${encodeURIComponent(thema.slug)}`;
+}
+
+function maakQrSvg(tekst, cellSize) {
+  const qr = qrcode(0, "M");
+  qr.addData(tekst);
+  qr.make();
+  return qr.createSvgTag({ cellSize, margin: 0 });
+}
+
+/* QR-code die altijd al naast de tekening staat (niet alleen bij het
+   printen) -- zodat je 'm ook op het scherm aan de patiënt kan laten zien. */
+function toonInteractieveQr(thema) {
+  document.getElementById("zijpaneel-qr").innerHTML = maakQrSvg(herbekijkUrl(thema), 5);
+}
+
 /* -------------------------------------------------------------------------
-   Beheer-info (Thuisarts-link + tekst voor thuis)
+   Beheer-info (aantekeningen, Thuisarts-link, tekst voor thuis)
    -------------------------------------------------------------------------
-   Deze twee velden staan NIET in het thema-bestand, maar in een klein
+   Deze velden staan NIET in het thema-bestand, maar in een klein
    opslagvakje op de server (netlify/functions/thema-info.js) -- dat is de
    enige manier waarop "invullen op deze pagina" ook echt zichtbaar wordt
    voor een patiënt die de QR-code op zijn eigen telefoon scant.
    GET is altijd publiek (alleen-lezen); opslaan vereist het wachtwoord.
+   Let op: net als de Thuisarts-link is dit zijpaneel zichtbaar op dezelfde
+   pagina die de patiënt thuis opent -- dus geen patiëntgegevens hierin.
    ------------------------------------------------------------------------- */
+
+const LEGE_THEMA_INFO = { thuisartsUrl: "", notitie: "", aantekeningen: "" };
 
 function themaInfoUrl(slug) {
   return `/api/thema-info?slug=${encodeURIComponent(slug)}`;
@@ -194,54 +243,27 @@ function themaInfoUrl(slug) {
 
 function laadThemaInfo(thema) {
   fetch(themaInfoUrl(thema.slug))
-    .then((res) => (res.ok ? res.json() : { thuisartsUrl: "", notitie: "" }))
-    .catch(() => ({ thuisartsUrl: "", notitie: "" }))
+    .then((res) => (res.ok ? res.json() : LEGE_THEMA_INFO))
+    .catch(() => LEGE_THEMA_INFO)
     .then((info) => toonThemaInfo(info));
 }
 
 function toonThemaInfo(info) {
-  const thuisartsLink = document.getElementById("thuisarts-link");
-  if (info.thuisartsUrl) {
-    thuisartsLink.href = info.thuisartsUrl;
-    document.getElementById("thuisarts-link-tekst").textContent = info.thuisartsUrl;
-    thuisartsLink.hidden = false;
-  } else {
-    thuisartsLink.hidden = true;
-  }
-
-  const notitieBlok = document.getElementById("notitie-blok");
-  if (info.notitie) {
-    document.getElementById("notitie-tekst").textContent = info.notitie;
-    notitieBlok.hidden = false;
-  } else {
-    notitieBlok.hidden = true;
-  }
-
   document.getElementById("print-thuisarts").textContent = info.thuisartsUrl
     ? `Meer lezen: ${info.thuisartsUrl}`
     : "";
   document.getElementById("print-notitie").textContent = info.notitie || "";
 
-  // Bewerk-formulier alvast vullen met de huidige waardes, zodat je bij
+  // Velden in het zijpaneel vullen met de huidige waardes, zodat je bij
   // het openen ziet wat er nu staat in plaats van lege velden.
+  document.getElementById("beheer-aantekeningen").value = info.aantekeningen || "";
   document.getElementById("beheer-thuisarts").value = info.thuisartsUrl || "";
   document.getElementById("beheer-notitie").value = info.notitie || "";
 }
 
 function initBeheerPaneel(thema) {
-  const toggle = document.getElementById("beheer-toggle");
   const form = document.getElementById("beheer-form");
-  const annuleren = document.getElementById("beheer-annuleren");
   const statusEl = document.getElementById("beheer-status");
-
-  toggle.addEventListener("click", () => {
-    form.hidden = !form.hidden;
-  });
-
-  annuleren.addEventListener("click", () => {
-    form.hidden = true;
-    statusEl.hidden = true;
-  });
 
   form.addEventListener("submit", (e) => {
     e.preventDefault();
@@ -249,6 +271,7 @@ function initBeheerPaneel(thema) {
     const wachtwoordVeld = document.getElementById("beheer-wachtwoord");
     const payload = {
       wachtwoord: wachtwoordVeld.value,
+      aantekeningen: document.getElementById("beheer-aantekeningen").value,
       thuisartsUrl: document.getElementById("beheer-thuisarts").value,
       notitie: document.getElementById("beheer-notitie").value
     };
@@ -272,10 +295,6 @@ function initBeheerPaneel(thema) {
         toonThemaInfo(info);
         statusEl.textContent = "Opgeslagen.";
         wachtwoordVeld.value = "";
-        setTimeout(() => {
-          form.hidden = true;
-          statusEl.hidden = true;
-        }, 1200);
       })
       .catch((err) => {
         statusEl.textContent = err.message;
