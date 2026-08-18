@@ -375,6 +375,13 @@ button {
   color: var(--inkt-zacht);
 }
 
+.beheer__hint {
+  font-size: 0.78rem;
+  font-weight: 400;
+  color: var(--inkt-zacht);
+  line-height: 1.4;
+}
+
 /* ---------- Printgebied ---------- */
 /* Los van het interactieve gebied: print toont altijd de VOLTOOIDE
    tekening, ongeacht bij welke stap de animatie op scherm net stond. */

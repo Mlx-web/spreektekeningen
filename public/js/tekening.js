@@ -7,11 +7,14 @@
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 
-// Hoe lang één stap over tekenen doet, en de korte pauze daarna voordat de
-// volgende stap begint. Hier aanpassen om trager/sneller te laten tekenen
-// (de CSS-transitieduur wordt hieruit gezet, niet los in stijl.css).
-const TEKEN_DUUR_MS = 2200;
-const PAUZE_TUSSEN_STAPPEN_MS = 500;
+// Tekensnelheid: eenheden SVG-padlengte per milliseconde. Een langere lijn
+// (bv. het lichaam) duurt hierdoor vanzelf langer dan een korte (bv. een
+// oogje) -- in plaats van dat elke stap even lang duurt ongeacht de lengte.
+// Kleiner getal = trager tekenen. MIN_TEKEN_DUUR_MS voorkomt dat een heel
+// kort lijntje (bv. een oog) bijna onzichtbaar snel "flitst".
+const TEKEN_SNELHEID = 0.48; // padlengte-eenheden per ms (~480 per seconde)
+const MIN_TEKEN_DUUR_MS = 900;
+const PAUZE_TUSSEN_STAPPEN_MS = 600;
 
 function haalSlugOp() {
   const params = new URLSearchParams(location.search);
@@ -76,33 +79,46 @@ function startInteractieveTekening(thema) {
       const pad = document.createElementNS(SVG_NS, "path");
       pad.setAttribute("d", d);
       pad.setAttribute("class", "tekening-pad");
-      pad.style.transitionDuration = `${TEKEN_DUUR_MS}ms`;
       svg.appendChild(pad);
       padenVanDezeStap.push(pad);
     });
     padenPerStap.push(padenVanDezeStap);
   });
 
-  // Padlengte kan pas na het toevoegen aan de DOM opgevraagd worden.
+  // Padlengte kan pas na het toevoegen aan de DOM opgevraagd worden. Elke
+  // stap krijgt zijn eigen tekenduur (het langste pad binnen die stap
+  // bepaalt hoe lang de stap duurt) -- zo tekent een lange lijn (bv. het
+  // lichaam) vanzelf langzamer dan een korte (bv. een oogje).
   //
   // Verborgen paden krijgen zowel dashoffset = lengte ALS opacity: 0.
   // Dashoffset alleen zou genoeg moeten zijn, maar sommige browsers laten
   // op het naadpunt van dash/gap soms een spookstipje zien (een
   // renderingdetail, geen logicafout) -- opacity: 0 sluit dat helemaal uit.
   //
-  // transition tijdelijk uitzetten: .tekening-pad heeft een CSS-transition
-  // op stroke-dashoffset (voor het latere teken-effect). Zonder deze truc
-  // animeert de allereerste keer verbergen óók mee -- dan flitst de hele
-  // tekening bij het openen van de pagina eerst zichtbaar en dan onzichtbaar.
-  padenPerStap.flat().forEach((pad) => {
-    const lengte = pad.getTotalLength();
-    pad.style.transition = "none";
-    pad.style.strokeDasharray = String(lengte);
-    pad.style.strokeDashoffset = String(lengte);
-    pad.style.opacity = "0";
-    pad.getBoundingClientRect(); // forceert een reflow vóór we de transition terugzetten
-    pad.style.transition = `stroke-dashoffset ${TEKEN_DUUR_MS}ms ease`;
-  });
+  // transition tijdelijk uitzetten: .tekening-pad krijgt zo meteen een
+  // CSS-transition op stroke-dashoffset (voor het teken-effect). Zonder
+  // deze truc animeert de allereerste keer verbergen óók mee -- dan flitst
+  // de hele tekening bij het openen van de pagina eerst zichtbaar en dan
+  // onzichtbaar.
+  const duurPerStap = padenPerStap.map((padenVanDezeStap) =>
+    Math.max(
+      MIN_TEKEN_DUUR_MS,
+      ...padenVanDezeStap.map((pad) => {
+        const lengte = pad.getTotalLength();
+        const duur = Math.max(MIN_TEKEN_DUUR_MS, lengte / TEKEN_SNELHEID);
+
+        pad.style.transition = "none";
+        pad.style.strokeDasharray = String(lengte);
+        pad.style.strokeDashoffset = String(lengte);
+        pad.style.opacity = "0";
+        pad.dataset.duur = String(duur);
+        pad.getBoundingClientRect(); // forceert een reflow vóór we de transition terugzetten
+        pad.style.transition = `stroke-dashoffset ${duur}ms ease`;
+
+        return duur;
+      })
+    )
+  );
 
   const totaalStappen = thema.stappen.length;
   let huidigeStap = 0; // aantal reeds getekende stappen
@@ -136,6 +152,7 @@ function startInteractieveTekening(thema) {
       return;
     }
     bijwerken(); // toont "Aan het tekenen: <label>" voor de stap die nu start
+    const duurDezeStap = duurPerStap[huidigeStap];
     padenPerStap[huidigeStap].forEach((pad) => {
       pad.style.opacity = "1";
       pad.style.strokeDashoffset = "0";
@@ -146,9 +163,9 @@ function startInteractieveTekening(thema) {
       timers.push(setTimeout(() => {
         bezig = false;
         bijwerken();
-      }, TEKEN_DUUR_MS));
+      }, duurDezeStap));
     } else {
-      timers.push(setTimeout(tekenVolgendeStap, TEKEN_DUUR_MS + PAUZE_TUSSEN_STAPPEN_MS));
+      timers.push(setTimeout(tekenVolgendeStap, duurDezeStap + PAUZE_TUSSEN_STAPPEN_MS));
     }
   }
 
@@ -170,7 +187,7 @@ function startInteractieveTekening(thema) {
       pad.style.strokeDashoffset = pad.style.strokeDasharray;
       pad.style.opacity = "0";
       pad.getBoundingClientRect();
-      pad.style.transition = `stroke-dashoffset ${TEKEN_DUUR_MS}ms ease`;
+      pad.style.transition = `stroke-dashoffset ${pad.dataset.duur}ms ease`;
     });
     huidigeStap = 0;
     bijwerken();
@@ -224,18 +241,18 @@ function toonInteractieveQr(thema) {
 }
 
 /* -------------------------------------------------------------------------
-   Beheer-info (aantekeningen, Thuisarts-link, tekst voor thuis)
+   Beheer-info (Thuisarts-link, tekst voor thuis)
    -------------------------------------------------------------------------
    Deze velden staan NIET in het thema-bestand, maar in een klein
    opslagvakje op de server (netlify/functions/thema-info.js) -- dat is de
    enige manier waarop "invullen op deze pagina" ook echt zichtbaar wordt
    voor een patiënt die de QR-code op zijn eigen telefoon scant.
    GET is altijd publiek (alleen-lezen); opslaan vereist het wachtwoord.
-   Let op: net als de Thuisarts-link is dit zijpaneel zichtbaar op dezelfde
-   pagina die de patiënt thuis opent -- dus geen patiëntgegevens hierin.
+   Let op: dit zijpaneel is zichtbaar op dezelfde pagina die de patiënt
+   thuis opent -- dus geen patiëntgegevens in deze velden.
    ------------------------------------------------------------------------- */
 
-const LEGE_THEMA_INFO = { thuisartsUrl: "", notitie: "", aantekeningen: "" };
+const LEGE_THEMA_INFO = { thuisartsUrl: "", notitie: "" };
 
 function themaInfoUrl(slug) {
   return `/api/thema-info?slug=${encodeURIComponent(slug)}`;
@@ -256,7 +273,6 @@ function toonThemaInfo(info) {
 
   // Velden in het zijpaneel vullen met de huidige waardes, zodat je bij
   // het openen ziet wat er nu staat in plaats van lege velden.
-  document.getElementById("beheer-aantekeningen").value = info.aantekeningen || "";
   document.getElementById("beheer-thuisarts").value = info.thuisartsUrl || "";
   document.getElementById("beheer-notitie").value = info.notitie || "";
 }
@@ -271,7 +287,6 @@ function initBeheerPaneel(thema) {
     const wachtwoordVeld = document.getElementById("beheer-wachtwoord");
     const payload = {
       wachtwoord: wachtwoordVeld.value,
-      aantekeningen: document.getElementById("beheer-aantekeningen").value,
       thuisartsUrl: document.getElementById("beheer-thuisarts").value,
       notitie: document.getElementById("beheer-notitie").value
     };

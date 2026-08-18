@@ -15,15 +15,14 @@ De site heeft drie niveaus:
 3. **Spreektekening** (`tekening.html?thema=<slug>`) — het eigenlijke
    werkscherm: de tekening met één knop ("Maak tekening") die alle stappen
    automatisch na elkaar tekent, printen, en een altijd zichtbaar zijpaneel
-   met de QR-code, eigen aantekeningen, de Thuisarts-link en de tekst voor
-   thuis.
+   met de QR-code, de Thuisarts-link en de tekst voor thuis.
 
 Gebouwd als een vrijwel volledig statische site — de tekeningen zelf, het
 menu en de animatie hebben geen backend of database nodig. Alleen voor de
-**invulbare** velden per thema (aantekeningen, de Thuisarts.nl-link, en een
-tekst die de patiënt thuis kan teruglezen) is er één klein opslag-vakje
-bijgekomen, zodat je dat direct op de pagina zelf kunt invullen — zie
-"Beheren" hieronder. Bedoeld voor gebruik door één persoon (jij), zonder
+**invulbare** velden per thema (de Thuisarts.nl-link en een tekst die de
+patiënt thuis kan teruglezen) is er één klein opslag-vakje bijgekomen,
+zodat je dat direct op de pagina zelf kunt invullen — zie "Beheren"
+hieronder. Bedoeld voor gebruik door één persoon (jij), zonder
 gebruikersrollen: één gedeeld wachtwoord is genoeg.
 
 ## Lokaal bekijken
@@ -31,9 +30,9 @@ gebruikersrollen: één gedeeld wachtwoord is genoeg.
 Voor het tekenen/animeren/printen: geen server nodig, open `public/index.html`
 gewoon direct in de browser (dubbelklikken volstaat).
 
-Voor het zijpaneel (aantekeningen, Thuisarts-link, tekst voor thuis) heb je
-wél een server nodig, omdat dat via een Netlify Function + opslag loopt.
-Lokaal test je dat met [Netlify CLI](https://docs.netlify.com/cli/get-started/):
+Voor het zijpaneel (Thuisarts-link, tekst voor thuis) heb je wél een server
+nodig, omdat dat via een Netlify Function + opslag loopt. Lokaal test je dat
+met [Netlify CLI](https://docs.netlify.com/cli/get-started/):
 
 ```bash
 npm install
@@ -42,7 +41,7 @@ npx netlify dev
 
 Dat start de site inclusief een lokale versie van de Functions/Blobs-opslag.
 Zonder `netlify dev` (dus bij gewoon dubbelklikken op `index.html`) werkt
-alles behalve het opslaan/tonen van die drie velden — die blijven dan
+alles behalve het opslaan/tonen van die twee velden — die blijven dan
 gewoon leeg, de rest van de site (tekenen, printen) werkt normaal door.
 
 De "mooie" URL's (`/tekeningen/<slug>`, `/categorieen/<slug>`) werken sowieso
@@ -60,7 +59,9 @@ wat overal werkt.
    **"Deploy"**.
 4. Ga naar **Site settings → Environment variables** en voeg toe:
    - `BEHEER_WACHTWOORD` — een zelfbedacht wachtwoord. Dit is wat je straks
-     intypt in het zijpaneel om aantekeningen/Thuisarts-link/tekst op te slaan.
+     intypt in het zijpaneel om de Thuisarts-link/tekst op te slaan. Het
+     voorkomt dat een willekeurige bezoeker die kan aanpassen — lezen kan
+     iedereen sowieso al, zonder wachtwoord.
    Daarna nog een **"Trigger deploy"** zodat de variabele meegenomen wordt.
 5. Je krijgt een gratis subdomein, bijvoorbeeld `iets-random.netlify.app`.
    Dat is meteen je basis-URL voor de QR-codes. Wil je later een eigen
@@ -71,30 +72,30 @@ wat overal werkt.
 Netlify Blobs (de opslag voor de Thuisarts-link/tekst) hoeft nergens apart
 aangezet te worden — dat werkt automatisch zodra de site op Netlify draait.
 
-## Beheren: aantekeningen, Thuisarts-link en tekst voor thuis invullen
+## Beheren: Thuisarts-link en tekst voor thuis invullen
 
 Naast elke tekening staat een zijpaneel, altijd zichtbaar (geen "Bewerken"-
 klik meer nodig):
-- **Aantekeningen (voor jezelf)** — vrij invulveld, bijvoorbeeld iets om
-  jezelf aan te herinneren voor het volgende consult over dit onderwerp.
 - **Thuisarts.nl-link** — kopieer de URL van de pagina die je kiest op
   thuisarts.nl (niet de QR-afbeelding daar — gewoon de link uit de
   adresbalk).
 - **Tekst voor thuis** — een vrij tekstveld dat de patiënt thuis kan
   teruglezen (bv. "bel gerust de praktijk bij vragen").
+- **Wachtwoord** — alleen nodig om iets te *wijzigen*. Lezen (de link/tekst
+  zien, ook door een patiënt thuis) kan altijd, zonder wachtwoord — dat is
+  precies wat een patiënt te zien krijgt zonder ooit een wachtwoord te
+  hoeven weten.
 
 Belangrijk: dit zijpaneel staat op **dezelfde pagina** die een patiënt via
 de QR-code thuis opent — er is geen inlog of rolonderscheid tussen jou en
 de patiënt (zoals overal in deze app). Laat er dus **geen patiëntgegevens**
-in zetten, ook niet in "Aantekeningen": alle drie de velden horen bij het
-*thema* (bv. "Hart"), niet bij een individuele patiënt of consult, en zijn
-voor iedereen die de pagina van dat thema opent hetzelfde. Opslaan (met het
-wachtwoord) is wél nodig om iets te wijzigen — ophalen/tonen niet.
+in zetten: beide velden horen bij het *thema* (bv. "Hart"), niet bij een
+individuele patiënt of consult, en zijn voor iedereen die de pagina van dat
+thema opent hetzelfde.
 
 Na het invullen van het wachtwoord en op "Opslaan" klikken, is de wijziging
 meteen zichtbaar — zowel op je eigen scherm als voor patiënten die de
-QR-code thuis scannen (en op een print die je daarna maakt, al staan de
-aantekeningen bewust niet op de print).
+QR-code thuis scannen (en op een print die je daarna maakt).
 
 ## Een nieuwe categorie toevoegen (lichaamsdeel/orgaan)
 
@@ -180,17 +181,26 @@ te animeren.
 Bediening: één klik op **"Maak tekening"** tekent alle stappen automatisch
 na elkaar (niet los per stap klikken) — de knop is uitgeschakeld terwijl dat
 bezig is. **"Opnieuw"** verbergt alles weer (instant, niet geanimeerd) zodat
-je opnieuw kunt beginnen. Hoe traag het tekenen gaat, en de korte pauze
-tussen stappen, staat bovenin `js/tekening.js` als `TEKEN_DUUR_MS` en
-`PAUZE_TUSSEN_STAPPEN_MS` — daar pas je de snelheid aan.
+je opnieuw kunt beginnen.
+
+Hoe traag het tekenen gaat is geen vaste tijd per stap, maar een snelheid
+(padlengte-eenheden per milliseconde): een lange lijn (bv. het lichaam)
+duurt daardoor vanzelf langer dan een korte (bv. een oogje), in plaats van
+dat alles even lang duurt ongeacht hoe lang de lijn is. Dat staat bovenin
+`js/tekening.js`:
+- `TEKEN_SNELHEID` — kleiner getal = trager tekenen.
+- `MIN_TEKEN_DUUR_MS` — ondergrens, zodat een heel kort lijntje niet
+  onzichtbaar snel "flitst".
+- `PAUZE_TUSSEN_STAPPEN_MS` — stilte tussen het klaar zijn van de ene stap
+  en het begin van de volgende.
 
 Het printgebied is een aparte, verborgen kopie van de tekening die **altijd
 volledig getekend** is (geen dasharray-gedoe nodig) plus een QR-code naar
 `<jouw-domein>/tekeningen/<slug>`, en (zodra ingevuld) de Thuisarts.nl-link
-en de tekst voor thuis als leesbare tekst (aantekeningen bewust niet). Die
-kopie staat los van de interactieve tekening op het scherm, dus printen
-halverwege een uitleg toont altijd het complete plaatje — niet de stap
-waar je net was. Dezelfde QR-code staat ook al in het zijpaneel op het
+en de tekst voor thuis als leesbare tekst. Die kopie staat los van de
+interactieve tekening op het scherm, dus printen halverwege een uitleg
+toont altijd het complete plaatje — niet de stap waar je net was. Dezelfde
+QR-code staat ook al in het zijpaneel op het
 scherm zelf, niet alleen op de print.
 
 ## Nog niet gebouwd, wel alvast in de opzet meegenomen

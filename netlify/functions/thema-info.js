@@ -1,14 +1,12 @@
 /* =========================================================================
    /api/thema-info  (via netlify.toml: /api/* -> /.netlify/functions/:splat)
 
-   Bewaart per thema-slug drie simpele, door de huisarts zelf invulbare
-   velden: eigen "aantekeningen", de Thuisarts.nl-link, en een vrij
-   tekstveld ("notitie") dat de patiënt thuis kan teruglezen. Bewust NIET
-   voor patiëntgegevens -- deze opslag is gekoppeld aan het THEMA (bv.
-   "hart"), niet aan een patiënt of consult, en blijft dus voor iedereen
-   die de pagina van dat thema opent hetzelfde (inclusief "aantekeningen":
-   die staat in hetzelfde zijpaneel als de rest, dus ook zichtbaar voor
-   wie de QR-code thuis scant -- er is geen apart inlog-/rolonderscheid).
+   Bewaart per thema-slug twee simpele, door de huisarts zelf invulbare
+   velden: de Thuisarts.nl-link en een vrij tekstveld ("notitie") dat de
+   patiënt thuis kan teruglezen. Bewust NIET voor patiëntgegevens -- deze
+   opslag is gekoppeld aan het THEMA (bv. "hart"), niet aan een patiënt of
+   consult, en blijft dus voor iedereen die de pagina van dat thema opent
+   hetzelfde (geen apart inlog-/rolonderscheid tussen huisarts en patiënt).
 
    GET  /api/thema-info?slug=hart          -> altijd toegestaan (publiek, alleen-lezen)
    POST /api/thema-info?slug=hart          -> vereist { wachtwoord } gelijk aan
@@ -16,7 +14,7 @@
    ========================================================================= */
 const { getStore } = require("@netlify/blobs");
 
-const LEGE_INFO = { thuisartsUrl: "", notitie: "", aantekeningen: "" };
+const LEGE_INFO = { thuisartsUrl: "", notitie: "" };
 
 exports.handler = async (event) => {
   const slug = event.queryStringParameters && event.queryStringParameters.slug;
@@ -49,8 +47,7 @@ exports.handler = async (event) => {
 
     const nieuweData = {
       thuisartsUrl: typeof body.thuisartsUrl === "string" ? body.thuisartsUrl.trim() : "",
-      notitie: typeof body.notitie === "string" ? body.notitie.trim() : "",
-      aantekeningen: typeof body.aantekeningen === "string" ? body.aantekeningen.trim() : ""
+      notitie: typeof body.notitie === "string" ? body.notitie.trim() : ""
     };
     await store.setJSON(slug, nieuweData);
     return json(200, nieuweData);
