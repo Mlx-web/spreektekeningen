@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spreektekeningen</title>
+  <link rel="stylesheet" href="css/stijl.css">
+</head>
+<body>
+
+  <header class="koptekst">
+    <h1 id="categorie-titel">Categorie</h1>
+    <a class="koptekst__terug" href="index.html">← Overzicht</a>
+  </header>
+  <p class="subtitel">Kies een tekening om te starten.</p>
+
+  <!-- Gevuld door js/categorie.js: één (zwart-wit) tegel per thema in deze categorie. -->
+  <main id="thema-grid" class="thema-grid" aria-label="Tekeningen in deze categorie"></main>
+
+  <script src="js/registry.js"></script>
+  <script src="js/categorieen/manifest.js"></script>
+  <script src="js/themas/manifest.js"></script>
+  <script src="js/categorie.js"></script>
+</body>
+</html>

@@ -6,6 +6,16 @@ de tekening "getekend" wordt terwijl er uitleg bij gegeven wordt. Na afloop
 kan de voltooide tekening geprint worden, met een QR-code waarmee de patiënt
 dezelfde uitleg thuis nog eens kan bekijken.
 
+De site heeft drie niveaus:
+1. **Startpagina** (`index.html`) — één kleurige tegel per lichaamsdeel/orgaan
+   ("categorie"), met een aangeleverde illustratie erop.
+2. **Categoriepagina** (`categorie.html?categorie=<slug>`) — de losse
+   spreektekeningen binnen die categorie, als eenvoudige zwart-witte
+   pentekening-tegels (bv. onder "Hart": de tekeningen "Hart" en "Hartklep").
+3. **Spreektekening** (`tekening.html?thema=<slug>`) — het eigenlijke
+   werkscherm: stap-voor-stap animatie, printen, en het "Bewerken"-paneel
+   (Thuisarts-link + tekst voor thuis).
+
 Gebouwd als een vrijwel volledig statische site — de tekeningen zelf, het
 menu en de animatie hebben geen backend of database nodig. Alleen voor het
 **invulbare** stukje per thema (de Thuisarts.nl-link en een tekst die de
@@ -33,9 +43,10 @@ Zonder `netlify dev` (dus bij gewoon dubbelklikken op `index.html`) werkt
 alles behalve het opslaan/tonen van de Thuisarts-link en de tekst voor thuis
 — die blijven dan gewoon leeg, de rest van de site werkt normaal door.
 
-De "mooie" QR-link (`/tekeningen/<slug>`) werkt sowieso pas na het live
-zetten (dat is een Netlify-redirect). Lokaal linkt het menu daarom naar
-`tekening.html?thema=<slug>`, wat overal werkt.
+De "mooie" URL's (`/tekeningen/<slug>`, `/categorieen/<slug>`) werken sowieso
+pas na het live zetten (dat zijn Netlify-redirects). Lokaal linken de tegels
+daarom naar `categorie.html?categorie=<slug>` en `tekening.html?thema=<slug>`,
+wat overal werkt.
 
 ## Live zetten op Netlify
 
@@ -74,18 +85,41 @@ Na het invullen van het wachtwoord en op "Opslaan" klikken, is de wijziging
 meteen zichtbaar — zowel op je eigen scherm als voor patiënten die de
 QR-code thuis scannen (en op een print die je daarna maakt).
 
-## Een nieuw thema toevoegen
+## Een nieuwe categorie toevoegen (lichaamsdeel/orgaan)
+
+1. Kopieer `public/js/categorieen/hart.js` naar
+   `public/js/categorieen/<jouw-slug>.js`.
+2. Pas `slug`, `titel` aan, en zet het pad naar de illustratie bij
+   `afbeelding` (zie hieronder voor hoe je die aanlevert). Leeg (`""`) mag
+   ook — dan valt de tegel terug op de gekleurde lijntekening van het
+   eerste thema in die categorie, als tijdelijke vervanger.
+3. Voeg `"<jouw-slug>"` toe aan `public/js/categorieen/manifest.js`.
+4. Geef bij elk thema dat hieronder moet vallen hetzelfde `categorie`-slug
+   mee (zie hieronder) — zonder dat blijft de categorie leeg.
+
+**Een illustratie aanleveren:** zet 'm als gewoon beeldbestand (PNG of JPG,
+maakt niet uit) ergens waar ik erbij kan — het makkelijkst is rechtstreeks
+naar de GitHub-repo uploaden (moet ingelogd zijn):
+[github.com/Mlx-web/spreektekeningen/upload/main](https://github.com/Mlx-web/spreektekeningen/upload/main),
+of zet 'm zelf in `public/img/categorieen/<slug>.png` en verwijs ernaar bij
+`afbeelding`.
+
+## Een nieuw thema toevoegen (losse spreektekening)
 
 1. Kopieer `public/js/themas/hart.js` naar `public/js/themas/<jouw-slug>.js`.
 2. Pas de inhoud aan:
    - `slug` — wordt onderdeel van de link (`/tekeningen/<slug>`). Alleen
      kleine letters, cijfers en streepjes.
-   - `titel`, `omschrijving` — voor in het menu (`omschrijving` staat niet
-     op de tegel zelf, maar bijvoorbeeld handig als `alt`-achtige notitie
-     voor jezelf).
-   - `kleur` — de achtergrondkleur van de tegel in het menu (hex, bv.
-     `"#F0654E"`). De volledig getekende versie van het thema wordt in de
-     gewone donkere lijnstijl bovenop die kleur getoond.
+   - `titel`, `omschrijving` — `omschrijving` staat niet zichtbaar op een
+     tegel, maar wel als toegankelijkheids-label.
+   - `categorie` — het slug van de categorie waar deze tekening onder moet
+     verschijnen (bv. `"hart"`). Moet overeenkomen met een slug uit
+     `public/js/categorieen/`.
+   - `kleur` — achtergrondkleur (hex), alleen gebruikt als de categorie
+     van dit thema nog geen `afbeelding` heeft: dan toont de startpagina
+     een tijdelijke gekleurde tegel met de volledige lijntekening van het
+     eerste thema in die categorie. Zodra de categorie wél een
+     `afbeelding` heeft, wordt `kleur` nergens meer gebruikt.
    - `viewBox` — het SVG-canvas, bv. `"0 0 400 400"`.
    - `stappen` — een lijst van stappen. Elke stap heeft een `label` (voor
      jezelf, verschijnt onder de tekening) en `paden`: één of meer
@@ -101,20 +135,26 @@ QR-code thuis scannen (en op een print die je daarna maakt).
 
 ```
 public/
-  index.html              Menuscherm
-  tekening.html            Animatie-/printscherm (leest ?thema=<slug> of /tekeningen/<slug>)
+  index.html              Startpagina: categorie-tegels (leest niets, toont alles)
+  categorie.html           Categoriepagina: zwart-witte thema-tegels (leest ?categorie=<slug> of /categorieen/<slug>)
+  tekening.html            Spreektekening: animatie/print/beheer (leest ?thema=<slug> of /tekeningen/<slug>)
   css/stijl.css             Alle styling
+  img/categorieen/          Aangeleverde illustraties per categorie (bv. hart.png)
   js/
-    registry.js              Thema-registratie + laadmechanisme (niet aanpassen om een thema toe te voegen)
-    menu.js                  Rendert het menuscherm
-    tekening.js               Animatielogica, printgebied, QR-code
+    registry.js              Registratie + laadmechanisme (niet aanpassen om iets toe te voegen)
+    categorie-overzicht.js    Rendert de startpagina
+    categorie.js             Rendert een categoriepagina
+    tekening.js               Animatielogica, printgebied, QR-code, beheer-paneel
     vendor/qrcode.js          QR-generator (MIT, lokaal — geen externe dienst nodig)
+    categorieen/
+      manifest.js              Lijst van actieve categorieën (hier voeg je een regel toe)
+      hart.js, oog.js, ...      Eén categorie = één bestand
     themas/
       manifest.js              Lijst van actieve thema's (hier voeg je een regel toe)
       hart.js, hartklep.js      Eén thema = één bestand — kopieer zo'n bestand voor een nieuw thema
 netlify/functions/
   thema-info.js             Opslaan/ophalen van de Thuisarts-link + tekst voor thuis (Netlify Blobs)
-netlify.toml               Hosting-config (publish-map, functions, /tekeningen/* en /api/* redirects)
+netlify.toml               Hosting-config (publish-map, functions, /tekeningen/*, /categorieen/* en /api/* redirects)
 package.json                Enige dependency: @netlify/blobs (voor thema-info.js)
 ```
 

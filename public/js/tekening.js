@@ -21,25 +21,37 @@ function toonFoutmelding(tekst) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  laadAlleThemas(() => {
-    const slug = haalSlugOp();
-    const thema = slug ? window.THEMAS[slug] : null;
+  laadAlleCategorieen(() => {
+    laadAlleThemas(() => {
+      const slug = haalSlugOp();
+      const thema = slug ? window.THEMAS[slug] : null;
 
-    if (!thema) {
-      toonFoutmelding(
-        slug
-          ? `Er is geen thema met de naam "${slug}" gevonden.`
-          : "Er is geen thema opgegeven."
-      );
-      return;
-    }
+      if (!thema) {
+        toonFoutmelding(
+          slug
+            ? `Er is geen thema met de naam "${slug}" gevonden.`
+            : "Er is geen thema opgegeven."
+        );
+        return;
+      }
 
-    startInteractieveTekening(thema);
-    vulPrintgebied(thema);
-    laadThemaInfo(thema);
-    initBeheerPaneel(thema);
+      startInteractieveTekening(thema);
+      vulPrintgebied(thema);
+      laadThemaInfo(thema);
+      initBeheerPaneel(thema);
+      zetTerugLink(thema);
+    });
   });
 });
+
+function zetTerugLink(thema) {
+  const terug = document.getElementById("koptekst-terug");
+  const categorie = window.CATEGORIEEN && window.CATEGORIEEN[thema.categorie];
+  if (categorie) {
+    terug.href = `categorie.html?categorie=${encodeURIComponent(categorie.slug)}`;
+    terug.textContent = `← ${categorie.titel}`;
+  }
+}
 
 function startInteractieveTekening(thema) {
   document.title = `Spreektekeningen — ${thema.titel}`;

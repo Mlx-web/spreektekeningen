@@ -12,6 +12,12 @@
   to = "/tekening.html"
   status = 200
 
+# Zelfde principe voor de categorie-omgevingen, bv. /categorieen/hart.
+[[redirects]]
+  from = "/categorieen/*"
+  to = "/categorie.html"
+  status = 200
+
 # Beheer-API (ophalen/opslaan van de Thuisarts-link + notitie per thema).
 [[redirects]]
   from = "/api/*"

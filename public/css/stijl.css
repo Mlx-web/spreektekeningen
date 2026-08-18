@@ -70,68 +70,120 @@ button {
   color: var(--inkt-zacht);
 }
 
-/* ---------- Menuscherm: kleurrijke tegel-grid ---------- */
+/* ---------- Startpagina: kleurrijke categorie-tegels ---------- */
 
-.thema-grid {
-  max-width: 1000px;
+.categorie-grid {
+  max-width: 1100px;
   margin: 0 auto;
   padding: 8px 24px 64px;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 22px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 24px;
 }
 
-.thema-tegel {
+.categorie-tegel {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  aspect-ratio: 4 / 5;
-  background: var(--kleur, var(--kaart));
-  border-radius: 20px;
+  display: block;
+  aspect-ratio: 3 / 4;
+  border-radius: 22px;
   overflow: hidden;
   text-decoration: none;
-  padding: 14px 10px 46px;
+  background: var(--kaart);
   box-shadow: 0 6px 0 rgba(0, 0, 0, 0.12);
   transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
 }
 
-.thema-tegel:hover,
-.thema-tegel:focus-visible {
+.categorie-tegel:hover,
+.categorie-tegel:focus-visible {
   transform: translateY(-4px) scale(1.02);
   box-shadow: 0 12px 0 rgba(0, 0, 0, 0.14);
 }
 
-.thema-tegel:active {
+.categorie-tegel:active {
   transform: translateY(0) scale(0.99);
   box-shadow: 0 3px 0 rgba(0, 0, 0, 0.12);
 }
 
-.thema-tegel__tekening {
+.categorie-tegel__afbeelding {
   width: 100%;
   height: 100%;
-  flex: 1 1 auto;
-  min-height: 0;
+  object-fit: cover;
+  display: block;
 }
 
-/* De tekening zelf blijft dezelfde donkere lijnstijl als op de tekenpagina
-   (.tekening-pad in de sectie hieronder) -- alleen de tegel erachter krijgt
-   kleur. Zo blijft er maar één plek (.tekening-pad) die bepaalt hoe een
-   lijn eruitziet. */
+/* Tijdelijke vervanger zolang er nog geen aangeleverde illustratie is
+   (zie categorie-overzicht.js -> bouwPlaceholderIllustratie). Dezelfde
+   opzet als de oude kleurrijke thema-tegel. */
+.categorie-tegel__placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 10px;
+  background: var(--kleur, var(--kaart));
+}
 
-.thema-tegel__naam {
+.categorie-tegel__placeholder svg {
+  width: 100%;
+  height: 100%;
+}
+
+.categorie-tegel__naam {
   position: absolute;
   left: 50%;
   bottom: 14px;
   transform: translateX(-50%);
   max-width: 86%;
   font-weight: 700;
-  font-size: 1.05rem;
-  padding: 6px 18px;
+  font-size: 1.1rem;
+  padding: 7px 20px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.92);
   color: var(--inkt);
   white-space: nowrap;
+}
+
+/* ---------- Categoriepagina: zwart-witte tekening-tegels ---------- */
+
+.thema-grid {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 8px 24px 64px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 18px;
+}
+
+.thema-kaart {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--kaart);
+  border: 1px solid var(--rand);
+  border-radius: var(--straal);
+  padding: 14px 12px 16px;
+  text-decoration: none;
+  color: var(--inkt);
+  transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.thema-kaart:hover,
+.thema-kaart:focus-visible {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(27, 111, 106, 0.12);
+}
+
+.thema-kaart__tekening {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+}
+
+.thema-kaart__naam {
+  margin-top: 10px;
+  font-weight: 600;
+  font-size: 0.95rem;
 }
 
 .leeg-bericht {
